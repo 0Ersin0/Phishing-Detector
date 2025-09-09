@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Algılama Aracı</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f2f5;
+        }
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            margin: 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Phishing Algılama Aracı</h1>
+        <p>Analiz etmek istediğiniz URL'yi aşağıya girin.</p>
+        <input type="text" id="urlInput" placeholder="URL'yi buraya girin...">
+        <button onclick="analyzeUrl()">Analiz Et</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function analyzeUrl() {
+    const url = document.getElementById('urlInput').value;
+    const resultDiv = document.getElementById('result');
+
+    if (url === "") {
+        resultDiv.textContent = "Lütfen bir URL girin.";
+        resultDiv.style.color = "red";
+        return;
+    }
+
+    resultDiv.textContent = "Analiz ediliyor...";
+    resultDiv.style.color = "#555";
+    
+    // fetch API kullanarak Python sunucusuna istek gönderme
+    fetch('/analyze', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: url })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'safe') {
+            resultDiv.textContent = data.message;
+            resultDiv.style.color = "green";
+        } else if (data.status === 'danger') {
+            resultDiv.textContent = data.message;
+            resultDiv.style.color = "red";
+        } else {
+            resultDiv.textContent = data.message;
+            resultDiv.style.color = "#555";
+        }
+    })
+    .catch((error) => {
+        console.error('Hata:', error);
+        resultDiv.textContent = "Sunucuya bağlanırken bir hata oluştu.";
+        resultDiv.style.color = "red";
+    });
+}
+    </script>
+</body>
+</html>
